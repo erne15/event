@@ -44,7 +44,7 @@ class Event(models.Model):
     end_repeat = models.DateField(_("end repeat"), null=True, blank=True)
     title = models.CharField(_("title"), max_length=255)
     description = models.TextField(_("description"))
-    thumbnail = models.ImageField(_("thumbnail"),upload_to="images/",blank=True)
+    thumbnail = models.ImageField(_("thumbnail"),upload_to="images/",null=True,blank=True)
     location = models.ManyToManyField(
         'Location', verbose_name=_('locations'), blank=True
     )
