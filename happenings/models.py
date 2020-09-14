@@ -49,8 +49,8 @@ class Event(models.Model):
         'Location', verbose_name=_('locations'), blank=True
     )
     objects = EventManager()
-   # created_by = models.ForeignKey(
-    #    auth_user_model, verbose_name=_("created by"), related_name='events',on_delete=models.CASCADE)
+    created_by = models.ForeignKey(
+    auth_user_model, verbose_name=_("created by"), related_name='events',on_delete=models.CASCADE)
     categories = models.ManyToManyField(
         'Category', verbose_name=_('categories'), blank=True
     )
