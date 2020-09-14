@@ -13,8 +13,7 @@ class EventAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': ('start_date', 'end_date', 'all_day', 'repeat',
-                       'end_repeat', 'title', 'description', 'thumbnail',
-                       'created_by',)
+                       'end_repeat', 'title', 'description', 'created_by',)
         }),
         ('Location', {
             'classes': ('collapse',),
