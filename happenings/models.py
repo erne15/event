@@ -33,19 +33,7 @@ class Event(models.Model):
         ('MONTHLY', _('Every Month')),
         ('YEARLY', _('Every Year')),
     )
-    COLORS = [
-        ('eeeeee', _('gray')),
-        ('ff0000', _('red')),
-        ('0000ff', _('blue')),
-        ('00ff00', _('green')),
-        ('000000', _('black')),
-        ('ffffff', _('white')),
-    ]
 
-    try:
-        COLORS += USER_COLORS
-    except Exception:
-        pass
 
     start_date = models.DateTimeField(verbose_name=_("start date"))
     end_date = models.DateTimeField(_("end date"))
@@ -68,21 +56,7 @@ class Event(models.Model):
     )
     tags = models.ManyToManyField('Tag', verbose_name=_('tags'), blank=True)
 
-    # --------------------------------COLORS-------------------------------- #
-    background_color = models.CharField(
-        _("background color"), max_length=10, choices=COLORS, default='eeeeee'
-    )
-    background_color_custom = models.CharField(
-        _("background color custom"), max_length=6, blank=True,
-        help_text=_('Must be a valid hex triplet. Default is gray (eeeeee)')
-    )
-    font_color = models.CharField(
-        _("font color"), max_length=10, choices=COLORS, default='000000'
-    )
-    font_color_custom = models.CharField(
-        _("font color custom"), max_length=6, blank=True,
-        help_text=_('Must be a valid hex triplet. Default is black (000000)')
-    )
+
 
     def __init__(self, *args, **kwargs):
         super(Event, self).__init__(*args, **kwargs)
@@ -176,20 +150,7 @@ class Event(models.Model):
     def start_end_diff(self):
         return self.get_start_end_diff()
 
-    def get_colors(self):
-        bg = self.background_color_custom
-        fnt = self.font_color_custom
-        if not bg:
-            bg = self.background_color
-        if not fnt:
-            fnt = self.font_color
-        bg = '#' + bg
-        fnt = '#' + fnt
-        return bg, fnt
 
-    @cached_property
-    def colors(self):
-        return self.get_colors()
 
     def will_occur(self, after_time):
         """Return True if the event will occur again after 'after_date'."""
@@ -239,7 +200,6 @@ class Event(models.Model):
     def clean(self):
         self.clean_start_end_dates()
         self.clean_repeat()
-        self.clean_colors()
 
     def clean_start_end_dates(self):
         if self.start_date and self.end_date:
@@ -264,26 +224,7 @@ class Event(models.Model):
                     for events that start and end on different days."
                 )
 
-    def clean_colors(self):
-        """Makes sure that if a custom color is supplied, it's valid."""
-        err = _("Color must be a valid hex triplet.")
-        colors = ['background_color_custom', 'font_color_custom']
-        colors2 = colors + ['background_color', 'font_color']
-        # If there are custom colors specified in settings, length of
-        # self.COLORS will be > 6, so check for validity
-        if len(self.COLORS) > 6:
-            colors = colors2
-        for color in colors:
-            c = getattr(self, color)
-            l = len(c)
-            if l:
-                if l != 6:
-                    raise ValidationError(err)
-                else:
-                    try:
-                        int(c, 16)
-                    except ValueError:
-                        raise ValidationError(err)
+
 
     def get_absolute_url(self):
         return reverse('calendar:detail', args=[str(self.id)])
